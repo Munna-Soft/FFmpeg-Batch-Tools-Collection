@@ -19,21 +19,21 @@
 ## 📂 Included Tools
 - `Video Format Converter.bat` → Convert any type video file format  
 - `Video to Audio Converter.bat` → Video to mp3 converter
-- `Remove Audio from Videos.bat` → Coming Soon
-- `Add Music to Silent Videos.bat` → Coming Soon
-- `Replace Audio Track in Videos.bat` → Coming Soon  
+- `Remove Audio from Videos.bat` → Sound Remove from bulk videos
+- `Add Music to Silent Videos.bat` → Sound add into bulk videos
+- `Replace Audio Track in Videos.bat` → Old music replace with new sound
+- `Video Sequence Cutter.bat` → Coming Soon
+- `Join Multiple Videos.bat` → Coming Soon  
 
 ## ⚙️ Setup (Core Feature Must)
-1. Install Recommended [FFmpeg](https://ffmpeg.org) and add it to your system PATH → `Windows environment variables`  
-   **or**  
-2. Download additional files `[ffmpeg.exe]` from GitHub Release & store them in the root directory.  
-3. Clone this repo:  
+1. Install [FFmpeg & FFprobe](https://ffmpeg.org) and add it to your system PATH → `Windows environment variables`   
+2. Clone this repo:  
    ```bash
    git clone https://github.com/Munna-Soft/FFmpeg-Batch-Tools-Collection.git
    ```  
    **or** download the repository as a `.zip` & extract.  
-4. Copy FFmpeg.exe executables to your root directory.  
-5. Run the batch scripts directly from Command Prompt or simply double-click.  
+3. Copy & paste FFmpeg & FFprobe executables to your root directory.  
+4. Run the batch scripts directly from Command Prompt or simply double-click.  
 
 ## 🚀 Usage Guides
 ### 🔹 Video Format Converter
@@ -46,12 +46,32 @@
 1. Run `Video to Audio Converter.bat` → auto folder setup.  
 2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)*   
 3. Run the script again & select your desire videos. *(Include Smart Selection)* 
-5. Find the result in the **Output** folder.  
+4. Find the result in the **Output** folder.  
+
+### 🔹 Remove Audio from Videos
+1. Run `Remove Audio from Videos.bat` → auto folder setup.  
+2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)*   
+3. Run the script again & select your desire videos. *(Include Smart Selection)* 
+4. Find the result in the **Output** folder. 
+
+### 🔹 Add Music to Silent Videos
+1. Run `Add Music to Silent Videos.bat` → auto folder setup.  
+2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)*  
+3. Place your audios in the **Music** folder. *(Formats: mp3 wav aac flac ogg m4a wma)* 
+4. Run the script again & select your desire videos+audios. *(Include Smart Selection)* 
+5. Find the result in the **Output** folder. 
+
+### 🔹 Replace Audio Track in Videos
+1. Run `Replace Audio Track in Videos.bat` → auto folder setup.  
+2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)*  
+3. Place your audios in the **Music** folder. *(Formats: mp3 wav aac flac ogg m4a wma)* 
+4. Run the script again & select your desire videos+audios. *(Include Smart Selection)* 
+5. Find the result in the **Output** folder. 
 
 ---
 
 ## 👨‍💻 Author
-🛠️ Developed and maintained by [Munna MasterMind](https://facebook.com/The.Munna) & [Portfolio](https://munna-soft.github.io/Portfolio) 👈  
+🛠️ Develop and maintaince by [Munna MasterMind](https://facebook.com/The.Munna) & [Portfolio](https://munna-soft.github.io/Portfolio) 👈  
 🌍 Open-source and free for all creators.  
 
 ## 📜 License
