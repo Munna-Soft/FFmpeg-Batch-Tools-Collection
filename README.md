@@ -17,13 +17,20 @@
 - 🎥 Ideal for creators, editors, and anyone needing quick processing without complex software.  
 
 ## 📂 Included Tools
-- `Video Format Converter.bat` → Convert any type video file format  
+- `Video Format Converter.bat` → Convert any type video file format
 - `Video to Audio Converter.bat` → Video to mp3 converter
 - `Remove Audio from Videos.bat` → Sound Remove from bulk videos
 - `Add Music to Silent Videos.bat` → Sound add into bulk videos
 - `Replace Audio Track in Videos.bat` → Old music replace with new sound
-- `Video Sequence Cutter.bat` → Coming Soon
-- `Join Multiple Videos.bat` → Coming Soon  
+- `Join Multiple Videos.bat` → Join multiple Clip make long videos
+- `Video Sequence Cutter.bat` → Cut long video into small part
+- `Frame-by-Frame Image Extractor.bat` → Coming Soon
+- `Create Short Videos from Images.bat` → Coming Soon
+- `Create Long Videos from Smaller Clips with Lopping.bat` → Coming Soon
+- `Create Long Videos from Smaller Clips with SlowMotion.bat` → Coming Soon
+- `Add Watermark in Videos.bat` → Coming Soon
+- `Overlay Text or Logo on Video.bat` → Coming Soon
+
 
 ## ⚙️ Setup (Core Feature Must)
 1. Install [FFmpeg & FFprobe](https://ffmpeg.org) and add it to your system PATH → `Windows environment variables`   
@@ -48,24 +55,41 @@
 3. Run the script again & select your desire videos. *(Include Smart Selection)* 
 4. Find the result in the **Output** folder.  
 
-### 🔹 Remove Audio from Videos
-1. Run `Remove Audio from Videos.bat` → auto folder setup.  
-2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)*   
+### 🔹 Remove Audio from Videos  
+1. Run `Remove Audio from Videos.bat` → auto folder setup. 
+2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)* 
 3. Run the script again & select your desire videos. *(Include Smart Selection)* 
-4. Find the result in the **Output** folder. 
-
-### 🔹 Add Music to Silent Videos
-1. Run `Add Music to Silent Videos.bat` → auto folder setup.  
-2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)*  
-3. Place your audios in the **Music** folder. *(Formats: mp3 wav aac flac ogg m4a wma)* 
-4. Run the script again & select your desire videos+audios. *(Include Smart Selection)* 
+4. Follow terminal command for automate your action. 
 5. Find the result in the **Output** folder. 
 
-### 🔹 Replace Audio Track in Videos
-1. Run `Replace Audio Track in Videos.bat` → auto folder setup.  
-2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)*  
+### 🔹 Add Music to Silent Videos  
+1. Run `Add Music to Silent Videos.bat` → auto folder setup. 
+2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)* 
 3. Place your audios in the **Music** folder. *(Formats: mp3 wav aac flac ogg m4a wma)* 
 4. Run the script again & select your desire videos+audios. *(Include Smart Selection)* 
+5. Follow terminal command for automate your action. 
+6. Find the result in the **Output** folder. 
+
+### 🔹 Replace Audio Track in Videos  
+1. Run `Replace Audio Track in Videos.bat` → auto folder setup. 
+2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)* 
+3. Place your audios in the **Music** folder. *(Formats: mp3 wav aac flac ogg m4a wma)* 
+4. Run the script again & select your desire videos+audios. *(Include Smart Selection)* 
+5. Follow terminal command for automate your action. 
+6. Find the result in the **Output** folder. 
+
+### 🔹 Join Multiple Videos  
+1. Run `Join Multiple Videos.bat` → auto folder setup. 
+2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)* 
+3. Run the script again & select your desire videos+videos. 
+4. Follow terminal command for automate your action. 
+5. Find the result in the **Output** folder. 
+
+### 🔹 Video Sequence Cutter  
+1. Run `Video Sequence Cutter.bat` → auto folder setup. 
+2. Place your videos in the **Videos** folder. *(Formats: mp4 mov avi mkv flv wmv mpg mpeg webm)* 
+3. Run the script again & select your desire videos. 
+4. Follow terminal command for automate your action. 
 5. Find the result in the **Output** folder. 
 
 ---

@@ -4,24 +4,31 @@ All notable changes to **FFmpeg Batch Tools Collection- Munna MasterMind** will 
 
 ---
 
+## [v4.2] – 2025-12-10  
+### 🏁 Version Update - Include New Tools  
+- Join Multiple Videos.bat  
+- Video Sequence Cutter.bat  
+
+---
+
 ## [v3.3] – 2025-12-08  
 ### 🏁 Version Update - Include New Tools  
-- Remove Audio from Videos.bat → Sound Remove from bulk videos
-- Add Music to Silent Videos → Sound add into bulk videos
-- Replace Audio Track in Videos → Old music replace with new sound
+- Remove Audio from Videos.bat  
+- Add Music to Silent Videos.bat  
+- Replace Audio Track in Videos.bat  
 
 ---
 
 ## [v2.2] – 2025-12-06  
 ### 🏁 Full Update - FFmpeg Batch Tools Collection  
-- Video Format Converter.bat → Convert any type video file format
-- Video to Audio Converter.bat → Bulk video to mp3 converter
+- Video Format Converter.bat  
+- Video to Audio Converter.bat  
 
 ---
 
 ## [v1.4] – 2025-09-24  
 ### 🏁 Initial Release - Ultimate Video Edit Tools AIO  
-- Auto Create Short Videos from Images.bat → Make short videos from images
-- Auto Create Long Videos from Shorts.bat → Convert shorts into long videos
-- Auto Join Multiple Videos.bat → Merge multiple videos
-- Long Video Sequence Cutter.bat → Cutting video clip
+- Auto Create Short Videos from Images.bat  
+- Auto Create Long Videos from Shorts.bat  
+- Auto Join Multiple Videos.bat  
+- Long Video Sequence Cutter.bat  
