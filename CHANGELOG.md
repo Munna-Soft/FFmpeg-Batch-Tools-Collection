@@ -4,6 +4,20 @@ All notable changes to **FFmpeg Batch Tools Collection- Munna MasterMind** will 
 
 ---
 
+## [5.9] - 2025-12-15  
+### 🏁 Version Update - Include New Tools  
+- Join Multiple Audios.bat
+- Audio Sequence Cutter.bat
+- Add Watermark in Videos.bat
+- Frame-by-Frame Image Extractor.bat
+- Create Images to Short Videos.bat
+- Remove Noise from Audios.bat
+- Remove Noise from Videos.bat
+- Create Long Videos With Loop.bat
+- Create Long Videos With SlowMotion.bat
+
+---
+
 ## [v4.2] – 2025-12-10  
 ### 🏁 Version Update - Include New Tools  
 - Join Multiple Videos.bat  
