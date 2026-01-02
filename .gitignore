@@ -1,0 +1,12 @@
+# Ignore compiled binaries
+ffmpeg.exe
+ffprobe.exe
+ffplay.exe
+
+# Ignore media files
+*.mp3
+*.mp4
+*.mkv
+*.jpg
+*.jpeg
+*.png

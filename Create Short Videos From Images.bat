@@ -1,18 +1,35 @@
 @echo off
-setlocal enabledelayedexpansion
-title Auto Create Short Videos from Images- by Munna MasterMind
+chcp 65001 >nul
+setlocal EnableDelayedExpansion
+title Create Short Videos From Images- by Munna MasterMind
 
-echo.
-echo ========================================================================================
-echo               Select Music for Short Video Creation- by Munna MasterMind
-echo                        https://facebook.com/The.Munna
-echo ========================================================================================
-echo.
+REM --- Base directory ---
+set "BASE_DIR=%~dp0"
+set "FFMPEG_DIR=%BASE_DIR%FFmpeg"
 
-:: ---- Paths ----
-set "ffmpeg=ffmpeg.exe"
+REM --- FFmpeg/FFprobe/FFplay binaries check ---
+if not exist "%FFMPEG_DIR%\ffmpeg.exe" (
+    echo [ERROR] ffmpeg.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffprobe.exe" (
+    echo [ERROR] ffprobe.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffplay.exe" (
+    echo [ERROR] ffplay.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+
+REM --- Use local FFmpeg ---
+set "FFMPEG=%FFMPEG_DIR%\ffmpeg.exe"
+
+REM ---- Folder Paths ----
 set "img_dir=Images"
-set "music_dir=Music"
+set "music_dir=Audios"
 set "out_dir=Output"
 set "temp_dir=Temp"
 
@@ -21,7 +38,15 @@ if not exist "%img_dir%" mkdir "%img_dir%"
 if not exist "%out_dir%" mkdir "%out_dir%"
 if not exist "%temp_dir%" mkdir "%temp_dir%"
 
-:: ---- List available audio ----
+echo.
+echo        ╔═══════════════════════════════════════════════════════╗
+echo        ║ Create Short Videos From Images by - Munna MasterMind ║
+echo        ║        https://munna-soft.github.io/Portfolio         ║
+echo        ║             https://facebook.com/The.Munna            ║
+echo        ╚═══════════════════════════════════════════════════════╝
+echo.
+
+REM ---- List available audio ----
 set j=0
 echo Available Music:
 for %%F in ("%music_dir%\*.mp3" "%music_dir%\*.wav" "%music_dir%\*.m4a" "%music_dir%\*.aac") do (
@@ -47,7 +72,7 @@ if not defined AUDIO (
     goto ASKAUD
 )
 
-:: Optional background music
+REM Optional background music
 set "bg=%music_dir%\bg.mp3"
 if exist "%bg%" (
     echo ℹ️ Background music found: bg.mp3 (will be mixed)
@@ -61,7 +86,7 @@ echo 🖼️ Images will be taken from: %img_dir%
 echo.
 echo ------------------------------------------
 
-:: ---- Ask for duration ----
+REM ---- Ask for duration ----
 :ASKDUR
 <nul set /p "=Enter Your Video Duration (5 to 60 seconds): "
 set /p "duration="
@@ -77,10 +102,10 @@ if %duration% GTR 60 (
     goto ASKDUR
 )
 
-:: Calculate fade-out start = duration - 1
+REM Calculate fade-out start = duration - 1
 set /a fadeout=%duration%-1
 
-:: ---- Process each image ----
+REM ---- Process each image ----
 set count=0
 for %%i in (%img_dir%\*.jpg %img_dir%\*.jpeg %img_dir%\*.png) do (
     set /a count+=1
@@ -102,12 +127,12 @@ for %%i in (%img_dir%\*.jpg %img_dir%\*.jpeg %img_dir%\*.png) do (
     echo Processing: %%~nxi with animation !anim_index!
 
     if defined bg (
-        "%ffmpeg%" -y -loop 1 -t %duration% -i "%%i" -stream_loop -1 -i "%AUDIO%" -stream_loop -1 -i "%bg%" ^
+        "%FFMPEG%" -y -loop 1 -t %duration% -i "%%i" -stream_loop -1 -i "%AUDIO%" -stream_loop -1 -i "%bg%" ^
         -filter_complex "[0:v]scale=1080:-1:force_original_aspect_ratio=decrease,pad=1080:1920:(1080-iw)/2:(1920-ih)/2,!anim![v];[1:a][2:a]amix=inputs=2:duration=longest:dropout_transition=0[aout]" ^
         -map "[v]" -map "[aout]" -t %duration% -pix_fmt yuv420p -preset veryfast ^
         "%out_dir%\!filename!"
     ) else (
-        "%ffmpeg%" -y -loop 1 -t %duration% -i "%%i" -stream_loop -1 -i "%AUDIO%" ^
+        "%FFMPEG%" -y -loop 1 -t %duration% -i "%%i" -stream_loop -1 -i "%AUDIO%" ^
         -filter_complex "[0:v]scale=1080:-1:force_original_aspect_ratio=decrease,pad=1080:1920:(1080-iw)/2:(1920-ih)/2,!anim![v]" ^
         -map "[v]" -map 1:a -t %duration% -pix_fmt yuv420p -preset veryfast ^
         "%out_dir%\!filename!"
@@ -117,3 +142,4 @@ for %%i in (%img_dir%\*.jpg %img_dir%\*.jpeg %img_dir%\*.png) do (
 echo.
 echo ✅ Done! Videos created with selected music (and optional bg.mp3).
 pause
+REM --- Code by Munna MasterMind ---

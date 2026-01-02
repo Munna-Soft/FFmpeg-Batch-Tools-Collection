@@ -1,11 +1,36 @@
 @echo off
-setlocal EnableExtensions EnableDelayedExpansion
+chcp 65001 >nul
+setlocal EnableDelayedExpansion
 title Create Long Videos With SlowMotion- by Munna MasterMind
 
-:: ---- FOLDERS ----
-set "ROOT=%~dp0"
+REM --- Base directory ---
+set "BASE_DIR=%~dp0"
+set "FFMPEG_DIR=%BASE_DIR%FFmpeg"
+
+REM --- FFmpeg/FFprobe/FFplay binaries check ---
+if not exist "%FFMPEG_DIR%\ffmpeg.exe" (
+    echo [ERROR] ffmpeg.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffprobe.exe" (
+    echo [ERROR] ffprobe.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffplay.exe" (
+    echo [ERROR] ffplay.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+
+REM --- Use local FFmpeg ---
+set "FFM=%FFMPEG_DIR%\ffmpeg.exe"
+set "FFP=%FFMPEG_DIR%\ffprobe.exe"
+
+:: ---- Folder Paths ----
 set "VIDDIR=%ROOT%Videos"
-set "AUDDIR=%ROOT%Music"
+set "AUDDIR=%ROOT%Audios"
 set "OUT=%ROOT%Output"
 set "TEMP=%ROOT%Temp"
 
@@ -14,22 +39,15 @@ if not exist "%AUDDIR%" md "%AUDDIR%"
 if not exist "%OUT%" md "%OUT%"
 if not exist "%TEMP%" md "%TEMP%"
 
-:: ---- FIND FFMPEG/FFPROBE ----
-set "FFM=ffmpeg.exe"
-set "FFP=ffprobe.exe"
-if not exist "%FFM%" set "FFM=ffmpeg"
-if not exist "%FFP%" set "FFP=ffprobe"
-%FFM% -version >nul 2>&1 || (echo ❌ ffmpeg.exe not found! Put ffmpeg.exe next to this BAT. & pause & exit /b)
+echo.
+echo        ╔══════════════════════════════════════════════════════════╗
+echo        ║ Create Long Videos With SlowMotion by - Munna MasterMind ║
+echo        ║          https://munna-soft.github.io/Portfolio          ║
+echo        ║               https://facebook.com/The.Munna             ║
+echo        ╚══════════════════════════════════════════════════════════╝
+echo.
 
-:: ---- LIST AVAILABLE VIDEOS ----
 set i=0
-echo.
-echo ========================================================================================
-echo           	Create Long Videos With SlowMotion- by Munna MasterMind
-echo                       https://munna-soft.github.io/Portfolio
-echo                          https://facebook.com/The.Munna
-echo ========================================================================================
-echo.
 echo =========== Available Videos ===========
 for %%F in ("%VIDDIR%\*.mp4" "%VIDDIR%\*.mov" "%VIDDIR%\*.mkv" "%VIDDIR%\*.webm" "%VIDDIR%\*.avi") do (
     set /a i+=1
@@ -42,7 +60,6 @@ echo.
 set /p "VIDCHOICE=Select Your Video [1-%i%]: "
 set "VIDEO=!VID%VIDCHOICE%!"
 if not defined VIDEO echo ❌ Invalid selection & pause & exit /b
-
 echo.
 
 :: ---- LIST AVAILABLE AUDIO ----
@@ -61,6 +78,7 @@ for %%F in ("%AUDDIR%\*.mp3" "%AUDDIR%\*.wav" "%AUDDIR%\*.m4a" "%AUDDIR%\*.aac")
 set /a TOTAL=j+1
 echo ------------------------------------------
 echo. 
+
 set /p "AUDCHOICE=Select Your Audio [1-%TOTAL%]: "
 set "AUDIO=!AUD%AUDCHOICE%!"
 
@@ -75,7 +93,7 @@ if not defined AUDIO (
 )
 
 echo.
-echo.
+
 if "%AUDCHOICE%"=="1" (
     echo ➜ You Selected: None (No music will be added)
 ) else (
@@ -115,12 +133,13 @@ if "!HAS_AUDIO!"=="" (
 :ASKSPEED
 cls
 echo.
-echo ========================================================================================
-echo          Select Slow-Motion Speed for Video Creation- by Munna MasterMind
-echo                       https://munna-soft.github.io/Portfolio
-echo                          https://facebook.com/The.Munna
-echo ========================================================================================
-echo. 
+echo        ╔══════════════════════════════════════════════════════════╗
+echo        ║ Create Long Videos With SlowMotion by - Munna MasterMind ║
+echo        ║          https://munna-soft.github.io/Portfolio          ║
+echo        ║               https://facebook.com/The.Munna             ║
+echo        ╚══════════════════════════════════════════════════════════╝
+echo.
+
 echo Video: %VIDEO% (!ORIG_WIDTH!x!ORIG_HEIGHT!)
 if "%AUDCHOICE%"=="1" (
     echo Audio: None (No Music)
@@ -137,7 +156,7 @@ echo     2. Very Slow (0.33x) - 3 times slower
 echo     3. Slow (0.5x) - 2 times slower
 echo     4. Slightly Slow (0.75x) - 1.33 times slower
 echo     5. Custom Speed (enter value between 0.1 to 0.9)
-echo ------------------------------------------
+echo ==================================================
 echo. 
 set /p "SPEEDCHOICE=Enter Your Choice [1-5]: "
 
@@ -196,29 +215,19 @@ if "%SPEEDCHOICE%"=="1" (
     if !CUSTOM_FACTOR! GEQ 0.5 (
         set "ATEMPO_FILTER=atempo=!CUSTOM_FACTOR!"
     ) else if !CUSTOM_FACTOR! GEQ 0.25 (
-        set "ATEMPO_FILTER=atempo=0.5,atempo=!CUSTOM_FACTOR:/=0.5!"
+        set "ATEMPO_FILTER=atempo=0.5,atempo=!CUSTOM_FACTOR!/0.5!"
     ) else (
-        set "ATEMPO_FILTER=atempo=0.5,atempo=0.5,atempo=!CUSTOM_FACTOR:/=0.25!"
+        set "ATEMPO_FILTER=atempo=0.5,atempo=0.5,atempo=!CUSTOM_FACTOR!/0.25!"
     )
     
     set "SPEEDNAME=Custom (!CUSTOM_FACTOR!x)"
 ) else (
     echo Invalid choice & goto ASKSPEED
 )
-
-echo ➜ Selected Speed: !SPEEDNAME!
 echo.
 
 :: ---- ASK DURATION (flexible: minutes or HH:MM) ----
 :ASKD
-cls
-echo.
-echo ========================================================================================
-echo          Input Duration for Long Video Creation- by Munna MasterMind
-echo                       https://munna-soft.github.io/Portfolio
-echo                          https://facebook.com/The.Munna
-echo ========================================================================================
-echo. 
 echo Video: %VIDEO% (!ORIG_WIDTH!x!ORIG_HEIGHT!)
 if "%AUDCHOICE%"=="1" (
     echo Audio: None (No Music)
@@ -237,10 +246,12 @@ echo    1:30    = 1 hour 30 minutes
 echo    2:45    = 2 hours 45 minutes
 echo    10:15   = 10 hours 15 minutes
 echo    24:00   = 24 hours 0 minutes
-echo ------------------------------------------
+echo ==================================================
 echo. 
+
 set "USERDUR="
 set /p "USERDUR=Enter Video Duration - max 24 Hours (HH:MM or minutes): "
+echo.
 
 if "%USERDUR%"=="" goto BADINPUT
 
@@ -283,8 +294,6 @@ set /a MM = TOTMIN %% 60
 if %HH% LSS 10 (set "HH=0%HH%")
 if %MM% LSS 10 (set "MM=0%MM%")
 set "DUR=%HH%:%MM%:00"
-
-echo ➜ Selected Duration: %DUR%
 goto ASKR
 
 :BADINPUT
@@ -295,14 +304,6 @@ goto ASKD
 
 :: ---- ASK RESOLUTION ----
 :ASKR
-cls
-echo.
-echo ========================================================================================
-echo          Select Resolution for Long Video Creation- by Munna MasterMind
-echo                       https://munna-soft.github.io/Portfolio
-echo                          https://facebook.com/The.Munna
-echo ========================================================================================
-echo. 
 echo Video: %VIDEO% (!ORIG_WIDTH!x!ORIG_HEIGHT!)
 if "%AUDCHOICE%"=="1" (
     echo Audio: None
@@ -313,7 +314,7 @@ echo Video In Audio: !HAS_VIDEO_AUDIO! (1=Yes, 0=No)
 echo Original Duration: !ORIG_DURATION! seconds
 echo Selected Speed: !SPEEDNAME! (!SLOW_FACTOR!x)
 echo Duration: %DUR% [Selected]
-echo ----------------------------
+echo ------------------------------------------
 echo. 
 echo Select resolution:
 echo     1. Original Resolution (!ORIG_WIDTH!x!ORIG_HEIGHT!)
@@ -321,9 +322,11 @@ echo     2. 720p (1280x720)
 echo     3. 1080p (1920x1080)
 echo     4. 2K (2560x1440)
 echo     5. 4K (3840x2160)
-echo ------------------------------------------
+echo ==================================================
 echo. 
 set /p "RESCHOICE=Enter Your Choice [1-5]: "
+echo.
+
 if "%RESCHOICE%"=="" set "RESCHOICE=1"
 
 if "%RESCHOICE%"=="1" (
@@ -361,6 +364,7 @@ echo ➜ Building %DUR% %RESNAME% video with !SPEEDNAME! effect...
 set "SLOW_VIDEO=%TEMP%\slow_video_temp.mp4"
 
 echo 🔄 Step 1: Creating slow-motion video (!SLOW_FACTOR!x speed)...
+echo.
 
 if defined SCALE_FILTER (
     set "VIDEO_FILTER=%SCALE_FILTER%setpts=!PTS_MULTIPLIER!*PTS,format=yuv420p"
@@ -379,7 +383,7 @@ if "!HAS_VIDEO_AUDIO!"=="1" (
 ) else (
     echo Applying video filter: !VIDEO_FILTER!
     
-    "%FFM%" -y -hide_banner -loglevel error -stats -i "%VIDEO%" ^
+    "%FFM%" -y -hide-banner -loglevel error -stats -i "%VIDEO%" ^
         -filter_complex "!VIDEO_FILTER!" ^
         -c:v libx264 -preset ultrafast -crf 25 ^
         "%SLOW_VIDEO%"
@@ -397,9 +401,6 @@ set "DURSAFE=%DUR::=-%"
 set "FINAL=%OUT%\SlowMo-!SLOW_FACTOR!x_%RESNAME%.mp4"
 
 echo 🔄 Step 2: Looping slow video to reach target duration...
-
-:: Convert target duration to seconds
-set /a TARGET_SECONDS = (HH * 3600) + (MM * 60)
 
 if "%AUDCHOICE%"=="1" (
     :: No external music
@@ -437,9 +438,9 @@ del /q "%SLOW_VIDEO%" >nul 2>&1
 
 if exist "%FINAL%" (
     echo.
-    echo ========================================================================================
+    echo ==================================================
     echo ✅ SUCCESS! Video created successfully!
-    echo ========================================================================================
+    echo ==================================================
     echo File: %FINAL%
     echo Settings:
     echo   - Resolution: %RESNAME% (!WIDTH!x!HEIGHT!)
@@ -453,10 +454,9 @@ if exist "%FINAL%" (
         set /a MEGABYTES=BYTES/1048576
         echo   !MEGABYTES! MB (!BYTES! bytes)
     )
-    echo ========================================================================================
+    echo ==================================================
 ) else (
-    echo ❌ Final video creation failed!
+    echo 
 )
-
 pause
 REM --- Code by Munna MasterMind ---

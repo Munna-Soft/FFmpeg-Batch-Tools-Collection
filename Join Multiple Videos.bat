@@ -1,33 +1,57 @@
 @echo off
-REM ============================================================
-REM Smart Merge Multiple Video Tools (Smart Selection Edition)
-REM       	Author: Munna MasterMind
-REM ============================================================
+chcp 65001 >nul
+setlocal EnableDelayedExpansion
+title Merge Multiple Videos - by Munna MasterMind
 
-setlocal enabledelayedexpansion
+REM --- Base directory ---
+set "BASE_DIR=%~dp0"
+set "FFMPEG_DIR=%BASE_DIR%FFmpeg"
 
-REM --- Folder Paths ---
-set "VIDEOS_DIR=%~dp0Videos"
-set "OUTPUT_DIR=%~dp0Output"
-
-REM --- Create Videos folder if missing ---
-if not exist "%VIDEOS_DIR%" (
-    echo [INFO] "Videos" folder not found. Creating This...
-    mkdir "%VIDEOS_DIR%"
-    echo Please put your video files inside the "Videos" folder and run this script again.
+REM --- FFmpeg/FFprobe/FFplay binaries check ---
+if not exist "%FFMPEG_DIR%\ffmpeg.exe" (
+    echo [ERROR] ffmpeg.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffprobe.exe" (
+    echo [ERROR] ffprobe.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffplay.exe" (
+    echo [ERROR] ffplay.exe not found in "FFmpeg" folder!
     pause
     exit /b
 )
 
-REM --- Step 2: List available videos ---
+REM --- Use local FFmpeg ---
+set "FFMPEG=%FFMPEG_DIR%\ffmpeg.exe"
+
+REM --- Folder Paths ---
+set "VIDEOS_DIR=%BASE_DIR%Videos"
+set "OUTPUT_DIR=%BASE_DIR%Output"
+
+REM --- Create Videos folder if missing ---
+if not exist "%VIDEOS_DIR%" (
+    echo.
+    echo [INFO] "Videos" folder not found. Creating This...
+    mkdir "%VIDEOS_DIR%"
+    echo.
+    echo Please put your video files inside the "Videos" folder and run this script again.
+    echo.
+    pause
+    exit /b
+)
+
 echo.
-echo ========================================================================================
-echo                  Merge Multiple Videos Tools - by Munna MasterMind
-echo                       https://munna-soft.github.io/Portfolio
-echo                          https://facebook.com/The.Munna
-echo ========================================================================================
+echo        ╔═══════════════════════════════════════════════════╗
+echo        ║     Join Multiple Videos by - Munna MasterMind    ║
+echo        ║       https://munna-soft.github.io/Portfolio      ║
+echo        ║          https://facebook.com/The.Munna           ║
+echo        ╚═══════════════════════════════════════════════════╝
 echo.
-echo ========== Available Videos ==========
+
+REM --- List available videos files ---
 set i=0
 for %%E in (mp4 mkv avi mov flv wmv mpg mpeg webm) do (
     for %%f in ("%VIDEOS_DIR%\*.%%E") do (
@@ -40,38 +64,40 @@ for %%E in (mp4 mkv avi mov flv wmv mpg mpeg webm) do (
 
 if %i%==0 (
     echo [WARN] No video files found in "%VIDEOS_DIR%".
+    echo.
+    echo Supported extensions: mp4 mkv avi mov flv wmv mpg mpeg webm
+    echo.
     pause
     exit /b
 )
 
-REM --- Show list ---
+echo ========== Available Videos ==========
 if %i% gtr 1 echo 0 = Join ALL videos
 for /l %%n in (1,1,%i%) do (
     echo %%n = !video[%%n]!
 )
-
-echo ================================================
+echo ==================================================
 echo.
-set /p sel="Enter the numbers of videos to merge (e.g: 1+3+5, 1 3 5, or 0 for ALL): "
+set /p sel="Enter the numbers of videos to merge (e.g: 1+3+5, 1 3 5, or 0 for ALL Sequential): "
 
-REM --- Step 2c: If user selects 0, join all videos ---
+REM --- If user selects 0, join all videos ---
 if "%sel%"=="0" (
     set sel=
     for /l %%n in (1,1,%i%) do set sel=!sel! %%n
 )
 
-REM --- Normalize input (replace + with space) ---
 set sel=%sel:+= %
 echo You selected: %sel%
 
-REM --- Step 3: Ask for resolution ---
+REM --- Ask for resolution ---
 echo.
 echo ========== Select Resolution ==========
 echo     1 = 720p (HD)
 echo     2 = 1080p (FHD)
-echo     3 = 1440p (2k)
-echo     4 = 2160p (4k)
+echo     3 = 1440p (2K)
+echo     4 = 2160p (4K)
 echo ==================================================
+echo.
 set /p reschoice="Enter the resolution number (1-4): "
 
 if "%reschoice%"=="1" set res=1280x720
@@ -85,50 +111,59 @@ if "%res%"=="" (
     exit /b
 )
 
-REM --- Step 4: Ask user for output filename ---
+REM --- Output filename ---
 echo.
 set /p outputname="Enter output file name (without extension, default: MergedVideo): "
 if "%outputname%"=="" set outputname=MergedVideo
 
-REM --- Step 5: Create temporary folder for converted videos ---
-set tempfilelist=temp_filelist.txt
-set tempfolder=TempConvert
+REM --- Temp files ---
+set "tempfilelist=%BASE_DIR%temp_filelist.txt"
+set "tempfolder=%BASE_DIR%Temp"
+
 if exist "%tempfolder%" rd /s /q "%tempfolder%"
 mkdir "%tempfolder%"
 if exist "%tempfilelist%" del "%tempfilelist%"
 
-REM --- Step 6: Convert all selected videos to same resolution & MP4 format ---
+REM --- Convert selected videos to uniform format ---
 for %%n in (%sel%) do (
     set "f=!video[%%n]!"
     if defined f (
         set "outfile=%tempfolder%\%%~nf.mp4"
-        echo Converting "!f!" to uniform MP4 format and resolution %res%...
-        ffmpeg -y -i "%VIDEOS_DIR%\!f!" -vf "scale=%res%,fps=24" -c:v libx264 -preset veryfast -crf 22 -c:a aac -b:a 128k -movflags +faststart "!outfile!"
+        echo Converting "!f!" to %res%...
+        "%FFMPEG%" -y -i "%VIDEOS_DIR%\!f!" ^
+        -vf "scale=%res%,fps=24" ^
+        -c:v libx264 -preset ultrafast -crf 25 ^
+        -c:a aac -b:a 128k -movflags +faststart "!outfile!"
         echo file '!outfile!'>> "%tempfilelist%"
     ) else (
-        echo Warning: Video number %%n not found, skipping.
+        echo [WARN] Video number %%n not found, skipping.
     )
 )
 
-REM --- Step 7: Ensure Output folder exists (on-demand) ---
-if not exist "%OUTPUT_DIR%" (
-    echo [INFO] Creating "Output" folder...
-    mkdir "%OUTPUT_DIR%"
-)
+REM --- Create Output folder ---
+if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
-REM --- Step 8: Merge videos using ffmpeg ---
 echo.
-echo Merging videos into "%OUTPUT_DIR%\%outputname%.mp4" with resolution %res%...
-ffmpeg -f concat -safe 0 -i "%tempfilelist%" -c:v libx264 -preset veryfast -crf 22 -c:a aac -b:a 128k -movflags +faststart "%OUTPUT_DIR%\%outputname%.mp4"
+echo --------------------------------------------------
+echo Merging videos into "%outputname%.mp4"
+echo --------------------------------------------------
+echo.
 
-REM --- Step 9: Cleanup ---
+"%FFMPEG%" -f concat -safe 0 -i "%tempfilelist%" ^
+ -c:v libx264 -preset ultrafast -crf 25 ^
+ -c:a aac -b:a 128k -movflags +faststart ^
+ "%OUTPUT_DIR%\%outputname%.mp4"
+
+REM --- Cleanup ---
 del "%tempfilelist%"
 rd /s /q "%tempfolder%"
 
 echo.
-echo ========================================================================================
-echo       All selected videos have been merged successfully!
-echo        Files saved in: "%OUTPUT_DIR%"
-echo ========================================================================================
+echo ==================================================
+echo    ✅ All selected videos have been merged successfully!
+echo    📁 Files saved in: "%OUTPUT_DIR%"
+echo ==================================================
+echo.
 pause
 exit /b
+REM ---Code by Munna MasterMind---

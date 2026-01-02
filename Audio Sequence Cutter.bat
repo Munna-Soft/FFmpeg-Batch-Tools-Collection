@@ -1,42 +1,61 @@
 @echo off
-REM ============================================================
-REM     Audio Sequence Cutter Tools - Munna MasterMind
-REM         https://munna-soft.github.io/Portfolio
-REM        	    Author: Munna MasterMind
-REM ============================================================
+chcp 65001 >nul
+setlocal EnableDelayedExpansion
+title Audio Sequence Cutter - by Munna MasterMind
 
-setlocal enabledelayedexpansion
+REM --- Base directory ---
+set "BASE_DIR=%~dp0"
+set "FFMPEG_DIR=%BASE_DIR%FFmpeg"
 
-:: ---------- FOLDER SETUP ----------
-set "ROOT=%~dp0"
-set "INPUT_FOLDER=%ROOT%Audios"
-set "OUTPUT_FOLDER=%ROOT%Output"
-set "TEMP=%ROOT%Temp"
-
-if not exist "%INPUT_FOLDER%" (
-    md "%INPUT_FOLDER%"
-    echo [INFO] Created "Audios" folder. Please put your audio files there and run this script again.
+REM --- FFmpeg/FFprobe/FFplay binaries check ---
+if not exist "%FFMPEG_DIR%\ffmpeg.exe" (
+    echo [ERROR] ffmpeg.exe not found in "FFmpeg" folder!
     pause
     exit /b
 )
-if not exist "%OUTPUT_FOLDER%" md "%OUTPUT_FOLDER%"
-if not exist "%TEMP%" md "%TEMP%"
-
-:: ---------- FFMPEG CHECK ----------
-set "FFMPEG=ffmpeg.exe"
-if not exist "%FFMPEG%" set "FFMPEG=ffmpeg"
-
-%FFMPEG% -version >nul 2>&1 || (
-    echo [ERROR] ffmpeg not found! Please install or put ffmpeg.exe in this folder.
+if not exist "%FFMPEG_DIR%\ffprobe.exe" (
+    echo [ERROR] ffprobe.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffplay.exe" (
+    echo [ERROR] ffplay.exe not found in "FFmpeg" folder!
     pause
     exit /b
 )
 
-:: ---------- SCAN FOR AUDIOS ----------
-echo Searching for audio files in "%INPUT_FOLDER%"...
+REM --- Use local FFmpeg ---
+set "FFMPEG=%FFMPEG_DIR%\ffmpeg.exe"
+
+REM --- Folder paths ---
+set "AUDIOS_DIR=%BASE_DIR%Audios"
+set "OUTPUT_DIR=%BASE_DIR%Output"
+set "TEMP=%BASE_DIR%Temp"
+
+REM --- Create Audios folder if missing ---
+if not exist "%AUDIOS_DIR%" (
+    echo.
+    echo [INFO] "Audios" folder not found. Creating This...
+    mkdir "%AUDIOS_DIR%"
+    echo.
+    echo Please put your audio files there and run this script again.
+    echo.
+    pause
+    exit /b
+)
+
+echo.
+echo        ╔═══════════════════════════════════════════════════╗
+echo        ║     Audio Sequence Cutter by - Munna MasterMind   ║
+echo        ║       https://munna-soft.github.io/Portfolio      ║
+echo        ║          https://facebook.com/The.Munna           ║
+echo        ╚═══════════════════════════════════════════════════╝
+echo.
+
+REM --- Detect Audio Files ---
 set "INDEX=0"
 for %%E in (mp3 wav flac aac m4a ogg) do (
-    for %%F in ("%INPUT_FOLDER%\*.%%E") do (
+    for %%F in ("%AUDIOS_DIR%\*.%%E") do (
         if exist "%%~fF" (
             set /a INDEX+=1
             set "AUDIO_!INDEX!=%%~nxF"
@@ -46,27 +65,23 @@ for %%E in (mp3 wav flac aac m4a ogg) do (
 )
 
 if %INDEX%==0 (
-    echo [ERROR] No audio files found in "%INPUT_FOLDER%".
+    echo [WARN] No audio files found in "%AUDIOS_DIR%".
+    echo.
+    echo Supported extensions: mp3 wav flac aac m4a ogg
+    echo.
     pause
     exit /b
 )
 
-:: ---------- SELECT AUDIO ----------
 :SELECT_AUDIO
-cls
-echo ================================================================================
-echo        Audio Sequence Cutter Tools - Munna MasterMind
-REM         	https://munna-soft.github.io/Portfolio
-REM        	    Author: Munna MasterMind
-echo ================================================================================
-echo.
-echo Available Audio Files:
+echo ========== Available Audios ==========
 for /l %%I in (1,1,%INDEX%) do (
     echo  %%I. !AUDIO_%%I!
 )
-echo --------------------------------------------------------------------------------
+echo ==================================================
 echo.
 set /p "CHOICE=Select an audio file (1-%INDEX%): "
+
 if "%CHOICE%"=="" goto SELECT_AUDIO
 if %CHOICE% lss 1 goto SELECT_AUDIO
 if %CHOICE% gtr %INDEX% goto SELECT_AUDIO
@@ -76,54 +91,56 @@ set "INPUT_FILE=!AUDIO_PATH_%CHOICE%!"
 
 echo.
 echo Selected Audio: !SELECTED_AUDIO!
-echo --------------------------------------------------------------------------------
-
-:: ---------- INPUT CUT TIMES ----------
+echo ==================================================
 echo.
+
+REM --- INPUT CUT TIMES ---
 :ASK_START
-set /p "START_TIME=Enter Start Time (HH:MM:SS or MM:SS or seconds): "
+set /p "START_TIME=Enter Start Time (HH:MM:SS / MM:SS / Seconds): "
 if "%START_TIME%"=="" goto ASK_START
 
 :ASK_END
-set /p "END_TIME=Enter End Time (HH:MM:SS or MM:SS or seconds): "
+set /p "END_TIME=Enter End Time (HH:MM:SS / MM:SS / Seconds): "
 if "%END_TIME%"=="" goto ASK_END
-
-:: ---------- OUTPUT FILE NAME ----------
 set "BASENAME=!SELECTED_AUDIO:~0,-4!"
-echo.
-set /p "OUTPUT_NAME=Enter Output Name (default: !BASENAME!_cut): "
-if "%OUTPUT_NAME%"=="" set "OUTPUT_NAME=!BASENAME!_cut"
-set "OUTPUT_FILE=%OUTPUT_FOLDER%\!OUTPUT_NAME!.mp3"
 
-echo --------------------------------------------------------------------------------
+echo.
+set /p "OUTPUT_NAME=Enter Output file Name (default: !BASENAME!_cut): "
+if "%OUTPUT_NAME%"=="" set "OUTPUT_NAME=!BASENAME!_cut"
+
+echo.
+echo --------------------------------------------------
 echo Input File : !SELECTED_AUDIO!
 echo Start Time : !START_TIME!
 echo End Time   : !END_TIME!
 echo Output File: !OUTPUT_NAME!.mp3
-echo --------------------------------------------------------------------------------
+echo --------------------------------------------------
 echo.
 
-:: ---------- AUTO-CUT OPERATION ----------
-echo ✂️ Cutting audio precisely...
-echo Please wait...
+REM --- Create Temp and Output folders ---
+if not exist "%TEMP%" mkdir "%TEMP%"
+if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
+set "OUTPUT_FILE=%OUTPUT_DIR%\!OUTPUT_NAME!.mp3"
 
-%FFMPEG% -y -ss !START_TIME! -to !END_TIME! -i "!INPUT_FILE!" -c copy "%OUTPUT_FILE%" -loglevel error -stats
+echo Cutting audio, please wait...
+echo.
+
+"%FFMPEG%" -y -ss !START_TIME! -to !END_TIME! -i "!INPUT_FILE!" ^
+ -c copy -loglevel error -stats "%OUTPUT_FILE%"
 
 if errorlevel 1 (
-    echo [ERROR] Cutting failed!
+    echo [ERROR] Conversion failed for !OUTPUT_NAME!
+    echo.
     pause
-    exit /b
+) else (
+    echo [OK] !OUTPUT_NAME! Conversion successfully!
+    echo.
+    pause
 )
 
-:: ---------- CLEANUP TEMP FOLDER ----------
+REM --- Cleanup ---
 if exist "%TEMP%" (
-    echo 🧹 Cleaning up temporary files...
     rmdir /s /q "%TEMP%" >nul 2>&1
 )
-
-echo.
-echo ✅ Successfully cut audio!
-echo 📁 Output saved at: !OUTPUT_FILE!
-echo --------------------------------------------------------------------------------
-pause
 exit /b
+REM --- Code by Munna MasterMind ---

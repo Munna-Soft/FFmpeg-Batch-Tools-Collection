@@ -1,36 +1,54 @@
 @echo off
-setlocal EnableExtensions EnableDelayedExpansion
+chcp 65001 >nul
+setlocal EnableDelayedExpansion
 title Create Long Videos With Loop- by Munna MasterMind
 
-:: ---- FOLDERS ----
-set "ROOT=%~dp0"
-set "VIDDIR=%ROOT%Videos"
-set "AUDDIR=%ROOT%Music"
-set "OUT=%ROOT%Output"
-set "TEMP=%ROOT%Temp"
+REM --- Base directory ---
+set "BASE_DIR=%~dp0"
+set "FFMPEG_DIR=%BASE_DIR%FFmpeg"
+
+REM --- FFmpeg/FFprobe/FFplay binaries check ---
+if not exist "%FFMPEG_DIR%\ffmpeg.exe" (
+    echo [ERROR] ffmpeg.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffprobe.exe" (
+    echo [ERROR] ffprobe.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffplay.exe" (
+    echo [ERROR] ffplay.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+
+REM --- Use local FFmpeg ---
+set "FFM=%FFMPEG_DIR%\ffmpeg.exe"
+set "FFP=%FFMPEG_DIR%\ffprobe.exe"
+
+:: ---- Folder Paths ----
+set "VIDDIR=%BASE_DIR%Videos"
+set "AUDDIR=%BASE_DIR%Audios"
+set "OUT=%BASE_DIR%Output"
+set "TEMP=%BASE_DIR%Temp"
 
 if not exist "%VIDDIR%" md "%VIDDIR%"
 if not exist "%AUDDIR%" md "%AUDDIR%"
 if not exist "%OUT%" md "%OUT%"
 if not exist "%TEMP%" md "%TEMP%"
 
-:: ---- FIND FFMPEG/FFPROBE ----
-set "FFM=ffmpeg.exe"
-set "FFP=ffprobe.exe"
-if not exist "%FFM%" set "FFM=ffmpeg"
-if not exist "%FFP%" set "FFP=ffprobe"
-%FFM% -version >nul 2>&1 || (echo ❌ ffmpeg.exe not found! Put ffmpeg.exe next to this BAT. & pause & exit /b)
+echo.
+echo        ╔═══════════════════════════════════════════════════════╗
+echo        ║  Create Long Videos With Loop by - Munna MasterMind   ║
+echo        ║        https://munna-soft.github.io/Portfolio         ║
+echo        ║             https://facebook.com/The.Munna            ║
+echo        ╚═══════════════════════════════════════════════════════╝
+echo.
 
-:: ---- LIST AVAILABLE VIDEOS ----
 set i=0
-echo.
-echo ========================================================================================
-echo           		Create Long Videos With Loop- by Munna MasterMind
-echo                       https://munna-soft.github.io/Portfolio
-echo                          https://facebook.com/The.Munna
-echo ========================================================================================
-echo.
-echo Available Videos:
+echo =========== Available Videos ===========
 for %%F in ("%VIDDIR%\*.mp4" "%VIDDIR%\*.mov" "%VIDDIR%\*.mkv" "%VIDDIR%\*.webm" "%VIDDIR%\*.avi") do (
     set /a i+=1
     set "VID!i!=%%~fF"
@@ -38,16 +56,15 @@ for %%F in ("%VIDDIR%\*.mp4" "%VIDDIR%\*.mov" "%VIDDIR%\*.mkv" "%VIDDIR%\*.webm"
 )
 if %i%==0 echo ❌ No video files found in %VIDDIR%! & pause & exit /b
 echo ------------------------------------------
+echo.
 set /p "VIDCHOICE=Select Your Video [1-%i%]: "
 set "VIDEO=!VID%VIDCHOICE%!"
 if not defined VIDEO echo ❌ Invalid selection & pause & exit /b
-
-echo.
 echo.
 
 :: ---- LIST AVAILABLE AUDIO ----
 set j=0
-echo Available Music:
+echo =========== Available Music ===========
 echo   1. None (No Music)
 set "AUD1="
 
@@ -60,6 +77,8 @@ for %%F in ("%AUDDIR%\*.mp3" "%AUDDIR%\*.wav" "%AUDDIR%\*.m4a" "%AUDDIR%\*.aac")
 
 set /a TOTAL=j+1
 echo ------------------------------------------
+echo.
+
 set /p "AUDCHOICE=Select Your Audio [1-%TOTAL%]: "
 set "AUDIO=!AUD%AUDCHOICE%!"
 
@@ -74,7 +93,7 @@ if not defined AUDIO (
 )
 
 echo.
-echo.
+
 if "%AUDCHOICE%"=="1" (
     echo ➜ You Selected: None (No music will be added)
 ) else (
@@ -109,10 +128,13 @@ if "!HAS_AUDIO!"=="" (
 :ASKD
 cls
 echo.
-echo ========================================================================================
-echo          Input Duration for Long Video Creation- by Munna MasterMind
-echo                        https://facebook.com/The.Munna
-echo ========================================================================================
+echo        ╔═══════════════════════════════════════════════════════╗
+echo        ║  Create Long Videos With Loop by - Munna MasterMind   ║
+echo        ║        https://munna-soft.github.io/Portfolio         ║
+echo        ║             https://facebook.com/The.Munna            ║
+echo        ╚═══════════════════════════════════════════════════════╝
+echo.
+
 echo Video: %VIDEO% (!ORIG_WIDTH!x!ORIG_HEIGHT!)
 if "%AUDCHOICE%"=="1" (
     echo Audio: None (No Music)
@@ -121,6 +143,7 @@ if "%AUDCHOICE%"=="1" (
 )
 echo Video In Audio: !HAS_VIDEO_AUDIO! (1=Yes, 0=No)
 echo ------------------------------------------
+echo. 
 echo Examples Duration:
 echo    5       = 5 minutes
 echo    10      = 10 minutes
@@ -128,16 +151,19 @@ echo    1:30    = 1 hour 30 minutes
 echo    2:45    = 2 hours 45 minutes
 echo    10:15   = 10 hours 15 minutes
 echo    24:00   = 24 hours 0 minutes
-echo ------------------------------------------
+echo ==================================================
+echo.
+
 set "USERDUR="
 set /p "USERDUR=Enter Video Duration - max 24 Hours (HH:MM or minutes): "
+echo.
 
 if "%USERDUR%"=="" goto BADINPUT
 
 :: remove spaces
 set "USERDUR=%USERDUR: =%"
 
-:: parse either H:MM or minutes-only
+:: parse either HH:MM or Minutes-only
 echo %USERDUR% | findstr ":" >nul 2>&1
 if errorlevel 1 (
     set "HOURS=0"
@@ -173,8 +199,6 @@ set /a MM = TOTMIN %% 60
 if %HH% LSS 10 (set "HH=0%HH%")
 if %MM% LSS 10 (set "MM=0%MM%")
 set "DUR=%HH%:%MM%:00"
-
-echo ➜ Selected Duration: %DUR%
 goto ASKR
 
 :BADINPUT
@@ -185,12 +209,6 @@ goto ASKD
 
 :: ---- ASK RESOLUTION ----
 :ASKR
-cls
-echo.
-echo ========================================================================================
-echo          Select Resolution for Long Video Creation- by Munna MasterMind
-echo                https://facebook.com/The.Munna
-echo ========================================================================================
 echo Video: %VIDEO% (!ORIG_WIDTH!x!ORIG_HEIGHT!)
 if "%AUDCHOICE%"=="1" (
     echo Audio: None
@@ -198,17 +216,20 @@ if "%AUDCHOICE%"=="1" (
     echo Audio: %AUDIO%
 )
 echo Video In Audio: !HAS_VIDEO_AUDIO! (1=Yes, 0=No)
-echo ------------------------------------------
 echo Duration: %DUR% [Selected]
-echo ----------------------------
-echo Select resolution:
+echo ------------------------------------------
+echo.
+echo ========== Select Resolution ==========
 echo     1. Original Resolution (!ORIG_WIDTH!x!ORIG_HEIGHT!)
 echo     2. 720p (1280x720)
 echo     3. 1080p (1920x1080)
 echo     4. 2K (2560x1440)
 echo     5. 4K (3840x2160)
-echo ------------------------------------------
+echo ==================================================
+echo. 
 set /p "RESCHOICE=Enter Your Choice [1-5]: "
+echo.
+
 if "%RESCHOICE%"=="" set "RESCHOICE=1"
 
 if "%RESCHOICE%"=="1" (
@@ -245,6 +266,7 @@ echo ➜ Building %DUR% %RESNAME% video...
 :: ---- STEP A: MAKE SHORT MERGED CLIP ----
 set "MIX=%TEMP%\mix_short_%RESNAME%.mp4"
 echo 🔊 Merging video + audio and encoding to %RESNAME%...
+echo.
 
 if "%AUDCHOICE%"=="1" (
   echo (No external music selected)

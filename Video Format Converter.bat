@@ -1,23 +1,55 @@
 @echo off
-REM ============================================================
-REM Video Format Converter Tools (Smart Selection Edition)
-REM             Author: Munna MasterMind
-REM ============================================================
+chcp 65001 >nul
+setlocal EnableDelayedExpansion
+title Video Format Converter - by Munna MasterMind
 
-SETLOCAL ENABLEDELAYEDEXPANSION
+REM --- Base directory ---
+set "BASE_DIR=%~dp0"
+set "FFMPEG_DIR=%BASE_DIR%FFmpeg"
 
-REM --- Folder paths ---
-set "VIDEOS_DIR=%~dp0Videos"
-set "OUTPUT_DIR=%~dp0Output"
-
-REM --- Create Videos folder if missing ---
-if not exist "%VIDEOS_DIR%" (
-    echo [INFO] "Videos" folder not found. Creating This...
-    mkdir "%VIDEOS_DIR%"
-    echo Please put your video files inside the "Videos" folder and run this script again.
+REM --- FFmpeg/FFprobe/FFplay binaries check ---
+if not exist "%FFMPEG_DIR%\ffmpeg.exe" (
+    echo [ERROR] ffmpeg.exe not found in "FFmpeg" folder!
     pause
     exit /b
 )
+if not exist "%FFMPEG_DIR%\ffprobe.exe" (
+    echo [ERROR] ffprobe.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffplay.exe" (
+    echo [ERROR] ffplay.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+
+REM --- Use local FFmpeg ---
+set "FFMPEG=%FFMPEG_DIR%\ffmpeg.exe"
+
+REM --- Folder paths ---
+set "VIDEOS_DIR=%BASE_DIR%Videos"
+set "OUTPUT_DIR=%BASE_DIR%Output"
+
+REM --- Create Videos folder if missing ---
+if not exist "%VIDEOS_DIR%" (
+    echo.
+    echo [INFO] "Videos" folder not found. Creating This...
+    mkdir "%VIDEOS_DIR%"
+    echo.
+    echo Please put your video files inside the "Videos" folder and run this script again.
+    echo.
+    pause
+    exit /b
+)
+
+echo.
+echo        ╔═══════════════════════════════════════════════════╗
+echo        ║   Video Format Converter by - Munna MasterMind    ║
+echo        ║       https://munna-soft.github.io/Portfolio      ║
+echo        ║          https://facebook.com/The.Munna           ║
+echo        ╚═══════════════════════════════════════════════════╝
+echo.
 
 REM --- Detect video files ---
 set /a idx=0
@@ -33,21 +65,14 @@ for %%E in (mp4 mov avi mkv flv wmv mpg mpeg webm) do (
 
 if %idx%==0 (
     echo [WARN] No video files found in "%VIDEOS_DIR%".
+    echo.
     echo Supported extensions: mp4 mov avi mkv flv wmv mpg mpeg webm
+    echo.
     pause
     exit /b
 )
 
-echo.
-echo ========================================================================================
-echo                Video Format Converter Tools - by Munna MasterMind
-echo                       https://munna-soft.github.io/Portfolio
-echo                          https://facebook.com/The.Munna
-echo ========================================================================================
-echo.
-
 echo ========== Available Videos ==========
-REM --- Show list ---
 if %idx% GTR 1 (
     echo  0 = Select All Videos
 )
@@ -68,8 +93,8 @@ if %idx% GTR 1 (
 if "%choice%"=="" goto ASK_VIDEO
 for /f "delims=0123456789" %%A in ("%choice%") do set invalid=1
 if defined invalid set invalid= & echo Invalid input. Try again. & goto ASK_VIDEO
-if %choice% lss 0 echo Invalid choice. & goto ASK_VIDEO
-if %choice% gtr %idx% echo Invalid choice. & goto ASK_VIDEO
+if %choice% lss 0 goto ASK_VIDEO
+if %choice% gtr %idx% goto ASK_VIDEO
 
 echo.
 echo ========== Choose Output Format ==========
@@ -85,8 +110,8 @@ set /p "fmt_choice=Enter output format option number (1-4): "
 if "%fmt_choice%"=="" goto ASK_FORMAT
 for /f "delims=0123456789" %%B in ("%fmt_choice%") do set invalid=1
 if defined invalid set invalid= & echo Invalid input. Try again. & goto ASK_FORMAT
-if %fmt_choice% lss 1 echo Invalid choice. & goto ASK_FORMAT
-if %fmt_choice% gtr 4 echo Invalid choice. & goto ASK_FORMAT
+if %fmt_choice% lss 1 goto ASK_FORMAT
+if %fmt_choice% gtr 4 goto ASK_FORMAT
 
 if "%fmt_choice%"=="1" set "EXT=mp4"
 if "%fmt_choice%"=="2" set "EXT=mkv"
@@ -94,70 +119,51 @@ if "%fmt_choice%"=="3" set "EXT=avi"
 if "%fmt_choice%"=="4" set "EXT=mov"
 
 REM --- Create Output folder ---
-if not exist "%OUTPUT_DIR%" (
-    echo [INFO] Creating "Output" folder...
-    mkdir "%OUTPUT_DIR%"
-)
+if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
 echo.
-echo ========================================
+echo --------------------------------------------------
 echo   Starting Conversion...
 echo   Output Format: %EXT%
-echo ========================================
+echo --------------------------------------------------
 echo.
 
-if %idx% GTR 1 (
-    if %choice%==0 (
-        echo You chose to convert ALL videos.
-        echo.
-        for /l %%i in (1,1,%idx%) do (
-            call :ConvertOne "%%i" "!path%%i!"
-        )
-    ) else (
-        echo You chose: !file%choice%!
-        echo.
-        call :ConvertOne "%choice%" "!path%choice%!"
+if %choice%==0 (
+    for /l %%i in (1,1,%idx%) do (
+        call :ConvertOne "%%i" "!path%%i!"
     )
 ) else (
-    call :ConvertOne "1" "!path1!"
+    call :ConvertOne "%choice%" "!path%choice%!"
 )
 
 echo.
-echo ========================================================================================
-echo        ✅ All conversions completed successfully!
-echo        Files saved in: "%OUTPUT_DIR%"
-echo ========================================================================================
+echo ==================================================
+echo    ✅ All conversions completed successfully!
+echo    📁 Files saved in: "%OUTPUT_DIR%"
+echo ==================================================
 echo.
 pause
 exit /b
 
 :ConvertOne
-REM --- Convert one video with progress & clean output ---
 set "NUM=%~1"
 set "INPATH=%~2"
 
-if not exist "%INPATH%" (
-    echo [ERROR] File not found: "%INPATH%"
-    goto :eof
-)
 for %%Z in ("%INPATH%") do set "NAME=%%~nZ"
 set "OUTFILE=%OUTPUT_DIR%\%NAME%.%EXT%"
 
-echo ----------------------------------------------------------
-echo Converting [#%NUM%]: "%NAME%"
-echo.
-echo (Progress shown below — warnings suppressed)
+echo --------------------------------------------------
+echo Converting [#%NUM%]: %NAME%
+echo --------------------------------------------------
 
-REM --- Run ffmpeg with clean output but visible progress ---
-ffmpeg -hide_banner -loglevel error -stats -y ^
- -i "%INPATH%" -c:v libx264 -c:a aac -strict -2 "%OUTFILE%"
+"%FFMPEG%" -hide_banner -loglevel error -stats -y ^ -i "%INPATH%" ^
+ -c:v libx264 -preset ultrafast -crf 25 ^
+ -c:a aac -b:a 128k ^ "%OUTFILE%"
 
 if errorlevel 1 (
-    echo [FAILED] Conversion failed for "%NAME%"
+    echo [FAILED] Conversion failed for %NAME%
 ) else (
-    echo.
-    echo [OK] "%NAME%" converted successfully!
+    echo [OK] %NAME% converted successfully!
 )
-echo ----------------------------------------------------------
 goto :eof
 REM --- Code by Munna MasterMind ---

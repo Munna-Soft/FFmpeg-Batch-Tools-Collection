@@ -1,37 +1,59 @@
 @echo off
-REM ============================================================
-REM Smart Video Noise Removal Tool (Smart Selection Edition)
-REM             Author: Munna MasterMind
-REM ============================================================
+chcp 65001 >nul
+setlocal EnableDelayedExpansion
+title Smart Video Noise Remover - by Munna MasterMind
 
-SETLOCAL ENABLEDELAYEDEXPANSION
+REM --- Base directory ---
+set "BASE_DIR=%~dp0"
+set "FFMPEG_DIR=%BASE_DIR%FFmpeg"
+
+REM --- FFmpeg/FFprobe/FFplay binaries check ---
+if not exist "%FFMPEG_DIR%\ffmpeg.exe" (
+    echo [ERROR] ffmpeg.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffprobe.exe" (
+    echo [ERROR] ffprobe.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+if not exist "%FFMPEG_DIR%\ffplay.exe" (
+    echo [ERROR] ffplay.exe not found in "FFmpeg" folder!
+    pause
+    exit /b
+)
+
+REM --- Use local FFmpeg ---
+set "FFMPEG=%FFMPEG_DIR%\ffmpeg.exe"
 
 REM --- Folder paths ---
-set "VIDEOS_DIR=%~dp0Videos"
-set "OUTPUT_DIR=%~dp0Output"
+set "VIDEOS_DIR=%BASE_DIR%Videos"
+set "OUTPUT_DIR=%BASE_DIR%Output"
 
 REM --- Create Videos folder if missing ---
 if not exist "%VIDEOS_DIR%" (
+    echo.
     echo [INFO] Creating "Videos" folder...
     mkdir "%VIDEOS_DIR%"
-    echo Please put your videos inside the "Videos" folder and run again.
+    echo.
+    echo Please put your video files inside the "Videos" folder and run again.
+    echo.
     pause
     exit /b
 )
 
 echo.
-echo ========================================================================================
-echo                Smart Video Noise Remover Tools - by Munna MasterMind
-echo                       https://munna-soft.github.io/Portfolio
-echo                          https://facebook.com/The.Munna
-echo ========================================================================================
+echo        ╔═══════════════════════════════════════════════════╗
+echo        ║  Smart Video Noise Remover by - Munna MasterMind  ║
+echo        ║       https://munna-soft.github.io/Portfolio      ║
+echo        ║          https://facebook.com/The.Munna           ║
+echo        ╚═══════════════════════════════════════════════════╝
 echo.
 
-REM List videos
-set i=0
-
+REM --- Detect video files ---
 echo ====== Available Videos ======
-echo 	0 = Process ALL videos
+set i=0
 for %%E in (mp4 mkv avi mov flv wmv mpg mpeg webm) do (
     for %%f in ("%VIDEOS_DIR%\*.%%E") do (
         if exist "%%~f" (
@@ -44,11 +66,12 @@ for %%E in (mp4 mkv avi mov flv wmv mpg mpeg webm) do (
 
 if %i%==0 (
     echo [WARN] No video files found in "%VIDEOS_DIR%".
+    echo.
+    echo Supported extensions: mp4 mkv avi mov flv wmv mpg mpeg webm
+    echo.
     pause
     exit /b
 )
-
-echo =============================================================
 
 if %i%==1 (
     echo.
@@ -56,19 +79,22 @@ if %i%==1 (
     set sel=1
     goto noise_level
 )
-
+echo ==================================================
 echo.
-set /p sel="Enter video numbers (e.g: 1+3+5 or 0): "
+
+set /p sel="Enter video number to process (0 for All): "
 
 REM replace + with space for loop-friendly format
 set sel=%sel:+= %
 
 REM If 0 → select all
 if "%sel%"=="0" (
+    echo 0 = Select All Videos
     set sel=
     for /l %%n in (1,1,%i%) do set sel=!sel! %%n
 )
 
+REM --- Validate selection ---
 :noise_level
 echo.
 echo ====== Select Noise Reduction Level ======
@@ -93,24 +119,23 @@ echo.
 set /p outputname="Enter output base name (default: CleanVideo): "
 if "%outputname%"=="" set outputname=CleanVideo
 
-REM Ensure Output folder exists
+REM --- Create Output folder ---
 if not exist "%OUTPUT_DIR%" mkdir "%OUTPUT_DIR%"
 
 echo.
-echo ===============================================
+echo --------------------------------------------------
 echo Processing videos... Please wait.
-echo ===============================================
+echo --------------------------------------------------
 
 set count=0
-
 for %%n in (%sel%) do (
     set "f=!video[%%n]!"
     if defined f (
         set /a count+=1
         echo.
         echo Cleaning Noise From: !f!
-        
-        ffmpeg -y -i "%VIDEOS_DIR%\!f!" ^
+
+        "%FFMPEG%" -y -i "%VIDEOS_DIR%\!f!" ^
         -vf "%NR%" ^
         -c:v libx264 -preset ultrafast -crf 25 ^
         -af "highpass=f=200, lowpass=f=3000" ^
@@ -120,9 +145,10 @@ for %%n in (%sel%) do (
 
 echo.
 echo =============================================================
-echo          All Videos Have Been Noise-Reduced!
-echo          Files saved in: "%OUTPUT_DIR%"
+echo    ✅ All Videos Have Been Noise-Reduced!
+echo    📁 Files saved in: "%OUTPUT_DIR%"
 echo =============================================================
+echo.
 pause
 exit /b
 REM --- Code by Munna MasterMind ---
