@@ -4,6 +4,13 @@ All notable changes to **FFmpeg Batch Tools Collection- Munna MasterMind** will 
 
 ---
 
+## [7.1] - 2026-02-20
+### 🎉 Refactoring Error + Include New Tools
+- ⏳ Fix some windows run time error
+- 🧩 Video Ratio Converter.bat
+
+---
+
 ## [6.4.16] - 2026-01-02
 ### 🎉 Refactoring + Include New Tools
 - ⚡ Performance Improvements

@@ -2,7 +2,7 @@
 ## GitAds Sponsored
 [![Sponsored by GitAds](https://gitads.dev/v1/ad-serve?source=munna-soft/ffmpeg-batch-tools-collection@github)](https://gitads.dev/v1/ad-track?source=munna-soft/ffmpeg-batch-tools-collection@github)
 
-# 🎬 FFmpeg Batch Tools Collection- Munna MasterMind  
+# 🎬 FFmpeg Batch Tools Collection v7.1- Munna MasterMind  
 
 <div align="center">
 <em> A lightweight collection of Windows batch tools for video editing multi-media automation. </em></center></div>
@@ -20,6 +20,7 @@
 ## 📂 Included Tools - Based on Local FFmpeg
 - `FFmpeg Latest Version Auto Downloader.bat` → Auto download binary files
 - `Video Format Converter.bat` → Convert any type video file format
+- `Video Ratio Converter.bat` → Video aspect ratio converter horizontal to vertical
 - `Video to Audio Converter.bat` → Video to mp3 converter
 - `Remove Audio from Videos.bat` → Sound Remove from bulk videos
 - `Add Music to Silent Videos.bat` → Sound add into bulk videos

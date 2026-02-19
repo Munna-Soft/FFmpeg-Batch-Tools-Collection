@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-title FFMPEG Batch Toolkit Multi Edition - by Munna MasterMind
+title FFMPEG Batch Toolkit Multi Edition v7.1- by Munna MasterMind
 setlocal enabledelayedexpansion
 
 :MAIN_MENU
@@ -9,51 +9,53 @@ echo.
 echo 	╔═══════════════════════════════════════════════════╗
 echo 	║     FFMPEG Batch Toolkit Multi Edition 2026       ║
 echo 	╠═══════════════════════════════════════════════════╣
-echo 	║   1.  Download and Setup FFMPEG Dependency        ║
+echo 	║   1.  Download FFMPEG and Setup Dependency        ║
 echo 	║   2.  Video Format Converter                      ║
-echo 	║   3.  Video To Audio Converter                    ║
-echo 	║   4.  Remove Audio from Videos                    ║
-echo 	║   5.  Add Music to Silent Videos                  ║
-echo 	║   6.  Replace Audio Track in Videos               ║
-echo 	║   7.  Join Multiple Audios                        ║
-echo 	║   8.  Join Multiple Videos                        ║
-echo 	║   9.  Audio Sequence Cutter                       ║
-echo 	║  10.  Video Sequence Cutter                       ║
-echo 	║  11.  Frame by Frame Image Extractor              ║
-echo 	║  12.  Create Short Videos From Images             ║
-echo 	║  13.  Create Long Videos From Images              ║
-echo 	║  14.  Create Long Videos with Loop                ║
-echo 	║  15.  Create Long Videos with SlowMotion          ║
-echo 	║  16.  Add Watermark to Videos                     ║
-echo 	║  17.  Remove Noise from Audios                    ║
-echo 	║  18.  Remove Noise from Videos                    ║
+echo 	║   3.  Video Ratio Converter                       ║
+echo 	║   4.  Video To Audio Converter                    ║
+echo 	║   5.  Remove Audio from Videos                    ║
+echo 	║   6.  Add Music to Silent Videos                  ║
+echo 	║   7.  Replace Audio Track in Videos               ║
+echo 	║   8.  Join Multiple Audios                        ║
+echo 	║   9.  Join Multiple Videos                        ║
+echo 	║   10. Audio Sequence Cutter                       ║
+echo 	║   11. Video Sequence Cutter                       ║
+echo 	║   12. Frame by Frame Image Extractor              ║
+echo 	║   13. Create Short Videos From Images             ║
+echo 	║   14. Create Long Videos From Images              ║
+echo 	║   15. Create Long Videos with Loop                ║
+echo 	║   16. Create Long Videos with SlowMotion          ║
+echo 	║   17. Add Watermark to Videos                     ║
+echo 	║   18. Remove Noise from Audios                    ║
+echo 	║   19. Remove Noise from Videos                    ║
 echo 	║   0.  Contact with Me	For Any Issue               ║
 echo 	║  00.  Exit Program                                ║
 echo 	╚═══════════════════════════════════════════════════╝
 echo.
 
 set "opt="
-set /p opt=Select option [0-18,00]: 
+set /p opt=Select option [0-19,00]: 
 
 :: Validation
 if "%opt%"=="1"  goto DOWNLOAD_FFMPEG
 if "%opt%"=="2"  goto VIDEO_FORMAT_CONVERTER
-if "%opt%"=="3"  goto VIDEO_TO_AUDIO_CONVERTER
-if "%opt%"=="4"  goto REMOVE_AUDIO_FROM_VIDEOS
-if "%opt%"=="5"  goto ADD_MUSIC_TO_SILENT_VIDEOS
-if "%opt%"=="6"  goto REPLACE_AUDIO_TRACK_IN_VIDEOS
-if "%opt%"=="7"  goto JOIN_MULTIPLE_AUDIOS
-if "%opt%"=="8"  goto JOIN_MULTIPLE_VIDEOS
-if "%opt%"=="9"  goto AUDIO_SEQUENCE_CUTTER
-if "%opt%"=="10" goto VIDEO_SEQUENCE_CUTTER
-if "%opt%"=="11" goto FRAME_FRAME_IMAGE_EXTRACTOR
-if "%opt%"=="12" goto CREATE_SHORT_VIDEOS_FROM_IMAGES
-if "%opt%"=="13" goto CREATE_LONG_VIDEOS_FROM_IMAGES
-if "%opt%"=="14" goto CREATE_LONG_VIDEOS_WITH_LOOP
-if "%opt%"=="15" goto CREATE_LONG_VIDEOS_WITH_SLOWMOTION
-if "%opt%"=="16" goto ADD_WATERMARK_TO_VIDEOS
-if "%opt%"=="17" goto REMOVE_NOISE_FROM_AUDIO
-if "%opt%"=="18" goto REMOVE_NOISE_FROM_VIDEOS
+if "%opt%"=="3"  goto VIDEO_RATIO_CONVERTER
+if "%opt%"=="4"  goto VIDEO_TO_AUDIO_CONVERTER
+if "%opt%"=="5"  goto REMOVE_AUDIO_FROM_VIDEOS
+if "%opt%"=="6"  goto ADD_MUSIC_TO_SILENT_VIDEOS
+if "%opt%"=="7"  goto REPLACE_AUDIO_TRACK_IN_VIDEOS
+if "%opt%"=="8"  goto JOIN_MULTIPLE_AUDIOS
+if "%opt%"=="9"  goto JOIN_MULTIPLE_VIDEOS
+if "%opt%"=="10" goto AUDIO_SEQUENCE_CUTTER
+if "%opt%"=="11" goto VIDEO_SEQUENCE_CUTTER
+if "%opt%"=="12" goto FRAME_FRAME_IMAGE_EXTRACTOR
+if "%opt%"=="13" goto CREATE_SHORT_VIDEOS_FROM_IMAGES
+if "%opt%"=="14" goto CREATE_LONG_VIDEOS_FROM_IMAGES
+if "%opt%"=="15" goto CREATE_LONG_VIDEOS_WITH_LOOP
+if "%opt%"=="16" goto CREATE_LONG_VIDEOS_WITH_SLOWMOTION
+if "%opt%"=="17" goto ADD_WATERMARK_TO_VIDEOS
+if "%opt%"=="18" goto REMOVE_NOISE_FROM_AUDIO
+if "%opt%"=="19" goto REMOVE_NOISE_FROM_VIDEOS
 if "%opt%"=="0"  goto CONTACT
 if "%opt%"=="00" exit /b
 
@@ -71,6 +73,11 @@ goto MAIN_MENU
 :VIDEO_FORMAT_CONVERTER
 cls
 call "%~dp0\Video Format Converter.bat"
+goto MAIN_MENU
+
+:VIDEO_RATIO_CONVERTER
+cls
+call "%~dp0\Video Ratio Converter.bat"
 goto MAIN_MENU
 
 :VIDEO_TO_AUDIO_CONVERTER
