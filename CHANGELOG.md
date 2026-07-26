@@ -4,6 +4,9 @@ All notable changes to **FFmpeg Batch Tools Collection- Munna MasterMind** will 
 
 ---
 
+## [8.1] - 2026-07-27
+- Add new animation in Create Videos From Images File
+
 ## [7.1] - 2026-02-20
 ### 🎉 Refactoring Error + Include New Tools
 - ⏳ Fix some windows run time error
